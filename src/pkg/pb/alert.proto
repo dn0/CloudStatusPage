@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "pkg/pb/job.proto";
+
+option go_package = "cspage/pkg/pb";
+
+enum AlertType {
+  PING_MISSING = 0;
+  PROBE_SLOW = 1;
+  PROBE_FAILURE = 2;
+  PROBE_TIMEOUT = 3;
+}
+
+enum AlertStatus {
+  ALERT_UNKNOWN = 0;
+  ALERT_CLOSED_AUTO = 1;
+  ALERT_CLOSED_MANUAL = 2;
+  ALERT_OPEN = 3;
+}
+
+message Alert {
+  string id = 1;
+  Job job = 2;
+  google.protobuf.Timestamp created = 3;
+  google.protobuf.Timestamp updated = 4;
+  google.protobuf.Timestamp time_begin = 5;
+  google.protobuf.Timestamp time_end = 6;
+  google.protobuf.Timestamp time_check = 7;
+  AlertType type = 8;
+  AlertStatus status = 9;
+  string cloud_region = 10;
+  string probe_name = 11;
+  uint32 probe_action = 12;
+  string incident_id = 13;
+  bytes data = 15;
+}

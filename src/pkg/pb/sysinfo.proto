@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+option go_package = "cspage/pkg/pb";
+
+message OSStat {
+  message Memory {
+    uint64 total = 1;
+    uint64 available = 2;
+    uint64 used = 3;
+    uint64 free = 4;
+    uint64 active = 5;
+    uint64 inactive = 6;
+    uint64 wired = 7;
+    uint64 laundry = 8;
+    uint64 buffers = 9;
+    uint64 cached = 10;
+    uint64 write_back = 11;
+    uint64 dirty = 12;
+    uint64 write_back_tmp = 13;
+    uint64 shared = 14;
+    uint64 slab = 15;
+  }
+
+  message CPU {
+    float user = 1;
+    float system = 2;
+    float idle = 3;
+    float nice = 4;
+    float iowait = 5;
+    float irq = 6;
+    float softirq = 7;
+    float steal = 8;
+  }
+
+  Memory mem = 1;
+  CPU cpu = 2;
+}
+
+message ProcStat {
+  message Memory {
+    uint64 rss = 1;
+    uint64 vms = 2;
+    uint64 hwm = 3;
+    uint64 data = 4;
+    uint64 stack = 5;
+    uint64 locked = 6;
+    uint64 swap = 7;
+  }
+
+  message IO {
+    uint64 read_count = 1;
+    uint64 write_count = 2;
+    uint64 read_bytes = 3;
+    uint64 write_bytes = 4;
+  }
+
+  int32 threads = 1;
+  int32 fds = 2;
+  float cpu_percent = 3;
+  Memory mem = 4;
+  IO io = 5;
+}
+
+message SysStat {
+  OSStat os = 1;
+  ProcStat proc = 2;
+}

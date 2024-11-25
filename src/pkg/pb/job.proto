@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cspage/pkg/pb";
+
+message Job {
+  string agent_id = 1;
+  string id = 2;
+  google.protobuf.Timestamp time = 3;
+  google.protobuf.Duration drift = 4;
+  google.protobuf.Duration took = 5;
+  string name = 6;
+  uint32 errors = 7;
+}

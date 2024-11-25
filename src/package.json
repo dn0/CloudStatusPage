@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "echarts": "^5.5.1",
+    "htmx.org": "^2.0.2",
+    "luxon": "^3.5.0"
+  }
+}

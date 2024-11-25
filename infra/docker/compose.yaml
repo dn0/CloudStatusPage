@@ -1,0 +1,15 @@
+name: cloudstatus
+
+volumes:
+  pubsub_data:
+    driver: local
+
+services:
+  pubsub:
+    image: google/cloud-sdk:emulators
+    command: "gcloud beta emulators pubsub start --project=cloudstatus-t --host-port='0.0.0.0:8085'"
+    ports:
+      - 8085:8085
+    volumes:
+      - pubsub_data:/opt/data
+

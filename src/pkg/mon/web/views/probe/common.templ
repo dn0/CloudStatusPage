@@ -1,0 +1,17 @@
+package probe
+
+templ tableContainer(header templ.Component, table templ.Component, tableNav templ.Component) {
+	<section class="w-full md:w-fit max-w-full">
+		<div class="well">
+			<header>
+				@header
+			</header>
+		</div>
+		<div class="well-nav mt-2 lg:mt-4">
+			@tableNav
+		</div>
+		<div class="well mt lg:mt-1">
+			@table
+		</div>
+	</section>
+}

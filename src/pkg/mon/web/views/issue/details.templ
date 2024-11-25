@@ -1,0 +1,211 @@
+package issue
+
+import (
+	"cspage/pkg/data"
+	"cspage/pkg/mon/web/templates"
+	"cspage/pkg/pb"
+	"strings"
+	"time"
+)
+
+templ detailsHeader(title string, cloud *data.Cloud, issue *data.Issue) {
+	<header>
+		<ol>
+			<li><a class="link" href={ templ.URL(cloud.URLPrefix()) }>{ cloud.Name }</a></li>
+			<li>&rsaquo;</li>
+			<li><a class="link" href={ templ.URL(issue.ListURL()) }>{ title }</a></li>
+			<li>&rsaquo;</li>
+			<li>
+				<a class="link" href={ templ.URL(issue.DetailsURL()) }>
+					@templates.ShortUUID(issue.Id)
+				</a>
+			</li>
+		</ol>
+	</header>
+}
+
+templ linkedAlerts(issues []*data.Issue) {
+	if len(issues) > 0 {
+		<ul>
+			for _, i := range issues {
+				<li class="list-disc list-inside">
+					<a href={ templ.URL(i.DetailsURL()) }>
+						@templates.IssueTypeSpan(i.Type)
+						@templ.Raw("&nbsp;")
+						@templates.IssueSeveritySpan(i.Severity())
+						@templ.Raw("&nbsp;")
+						<span class="link">
+							{ i.Summary() }
+							in
+							{ i.CloudRegions[0] }
+						</span>
+					</a>
+				</li>
+			}
+		</ul>
+	}
+}
+
+templ parentIncident(issues []*data.Issue) {
+	if len(issues) > 0 {
+		<ul>
+			for _, i := range issues {
+				<li class="list-disc list-inside">
+					<a href={ templ.URL(i.DetailsURL()) }>
+						@templates.IssueTypeSpan(i.Type)
+						@templ.Raw("&nbsp;")
+						@templates.IssueSeveritySpan(i.Severity())
+						@templ.Raw("&nbsp;")
+						<span class="link">
+							{ i.Summary() }
+						</span>
+					</a>
+				</li>
+			}
+		</ul>
+	}
+}
+
+templ detailsTable(cloud *data.Cloud, issue *data.Issue, related []*data.Issue) {
+	<table class="table-bordered w-full">
+		<tbody class="text-left">
+			<tr>
+				<th>Summary:</th>
+				<td>
+					@templates.IssueTypeSpan(issue.Type)
+					@templ.Raw("&nbsp;")
+					@templates.IssueSeveritySpan(issue.Severity())
+					@templ.Raw("&nbsp;")
+					{ issue.Summary() }
+				</td>
+			</tr>
+			<tr>
+				<th>Cloud:</th>
+				<td>
+					<a class="link" href={ templ.URL(cloud.URLPrefix()) }>{ cloud.Name }</a>
+				</td>
+			</tr>
+			<tr>
+				<th>Region(s):</th>
+				<td>
+					<div class="flex flex-col">
+						for _, region := range issue.Regions() {
+							<div>
+								<a class="link text-nowrap" href={ templ.URL(cloud.URLPrefix() + region.URLPrefix()) }>{ region.Name }</a>
+							</div>
+						}
+					</div>
+				</td>
+			</tr>
+			<tr>
+				if issue.Type == data.IssueTypeAlert {
+					<th>Probe action:</th>
+					<td>
+						if issue.AlertData == nil || issue.AlertData.ProbeActionName == "" {
+							{ issue.AlertProbeName }
+						} else {
+							{ issue.AlertData.ProbeActionName }
+						}
+					</td>
+				}
+			</tr>
+			<tr>
+				<th>Status:</th>
+				<td>
+					@templates.IssueStatusSpan(issue.Status())
+				</td>
+			</tr>
+			<tr>
+				<th>Detected:</th>
+				<td>
+					@templates.TimestampWithSeconds(issue.Created)
+				</td>
+			</tr>
+			<tr>
+				<th>Started:</th>
+				<td>
+					@templates.TimestampWithSeconds(issue.TimeBegin)
+				</td>
+			</tr>
+			<tr>
+				<th>Ended:</th>
+				<td>
+					if issue.TimeEnd != nil && issue.Status() != pb.IncidentStatus_INCIDENT_OPEN {
+						@templates.TimestampWithSeconds(*issue.TimeEnd)
+					}
+				</td>
+			</tr>
+			<tr>
+				<th>Duration:</th>
+				<td>
+					@templates.Duration(issue.Duration(time.Now()), time.Second)
+				</td>
+			</tr>
+			if issue.Type == data.IssueTypeAlert {
+				<tr>
+					<th>Trigger:</th>
+					<td>
+						<code>{ issue.AlertData.Trigger }</code>
+					</td>
+				</tr>
+				<tr>
+					<th>Error:</th>
+					<td>
+						<div class="max-w-md text-xs font-mono break-all whitespace-pre-wrap bg-gray-50 dark:bg-gray-900">
+							{ data.ParseProbeError(issue.AlertData.ProbeError) }
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>Parent incident:</th>
+					<td>
+						@parentIncident(related)
+					</td>
+				</tr>
+			} else {
+				<tr>
+					<th>Connected alerts:</th>
+					<td>
+						@linkedAlerts(related)
+					</td>
+				</tr>
+			}
+			<tr>
+				<th>Links:</th>
+				<td>
+					<ul class="list-disc list-inside md:list-disc">
+						for _, link := range issue.Links() {
+							<li>
+								if strings.HasPrefix(link.URL, "http") {
+									<a class="link-ext hx-disable" href={ templ.URL(link.URL) }>{ link.Name }</a>
+								} else {
+									<a class="link-int" href={ templ.URL(link.URL) }>{ link.Name }</a>
+								}
+							</li>
+						}
+					</ul>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+}
+
+templ detailsTempl(title string, cloud *data.Cloud, issue *data.Issue, related []*data.Issue) {
+	<section>
+		<div class="well">
+			@detailsHeader(title, cloud, issue)
+		</div>
+		<div class="lg:grid lg:grid-cols-2 lg:gap-2 xl:gap-4">
+			<div class="well mt-2 lg:mt-4">
+				@detailsTable(cloud, issue, related)
+			</div>
+			if issue.Type == data.IssueTypeAlert {
+				if chartURL := issue.ChartURL(); chartURL != "" {
+					<div hx-get={ chartURL } hx-trigger="load" hx-indicator=".loading-div">
+						@templates.ChartDiv("chart-issue", true)
+					</div>
+				}
+			}
+		</div>
+	</section>
+}

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "pkg/pb/job.proto";
+import "pkg/pb/sysinfo.proto";
+
+option go_package = "cspage/pkg/pb";
+
+message Ping {
+  Job job = 1;
+  SysStat sysstat = 10;
+}

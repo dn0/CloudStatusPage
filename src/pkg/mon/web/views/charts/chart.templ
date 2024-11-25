@@ -1,0 +1,56 @@
+package charts
+
+import (
+	"context"
+	"io"
+	"cspage/pkg/mon/web/templates"
+	"strings"
+)
+
+const (
+	chartScriptEventTemplate = "chart_{id}.on('{event}', {handler});\n"
+	chartScriptTemplate      = `<script>"use strict";
+(function () {
+var chart_{id} = echarts.init(document.getElementById('{id}'), echartTheme(), { renderer: 'canvas' });
+var chart_config_{id} = {config};
+activeCharts.set('{id}', chart_{id});
+chart_{id}.setOption(chart_config_{id});
+{functions}
+})();</script>`
+)
+
+func chartScriptTempl[T chartType](chart T) templ.Component {
+	return templ.ComponentFunc(func(_ context.Context, w io.Writer) error {
+		config, err := chart.Config()
+		if err != nil {
+			return err
+		}
+		functions := ""
+		for _, listener := range chart.EventFunctions() {
+			functions += strings.NewReplacer(
+				"{id}", chart.ID(),
+				"{event}", listener.EventName,
+				"{handler}", string(listener.Handler),
+			).Replace(chartScriptEventTemplate)
+		}
+		s := strings.NewReplacer(
+			"{id}", chart.ID(),
+			"{config}", config,
+			"{functions}", functions,
+		).Replace(chartScriptTemplate)
+		_, err = io.WriteString(w, s)
+		return err
+	})
+}
+
+templ chartsTempl[T chartType](charts []T) {
+	for _, chart := range charts {
+		@templates.ChartDiv(chart.ID(), false)
+		@chartScriptTempl(chart)
+	}
+}
+
+templ mapChartTempl(chart *mapChart) {
+	@templates.MapChartDiv(chart.ID(), false)
+	@chartScriptTempl(chart)
+}

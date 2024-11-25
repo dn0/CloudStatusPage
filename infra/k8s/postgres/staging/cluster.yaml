@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: core
+spec:
+  instances: 1
+  storage:
+    size: 20Gi
+    storageClass: standard-rwo
+  backup:
+    barmanObjectStore:
+      destinationPath: "gs://cloudstatus-s-backups/postgres"
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
+    podAntiAffinityType: preferred

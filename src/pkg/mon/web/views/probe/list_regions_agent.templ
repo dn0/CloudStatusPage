@@ -1,0 +1,75 @@
+package probe
+
+import (
+	"cspage/pkg/data"
+	"cspage/pkg/mon/web/templates"
+	"strconv"
+	"time"
+)
+
+templ listAgentRegionsTable(cloud *data.Cloud, probe *data.ProbeDefinition, agents []*agentInfo, issues *issueMap) {
+	<table class="table-bordered table-auto">
+		<thead class="text-center">
+			<tr class="text-xs md:test-sm">
+				<th></th>
+				<th class="border-left">{ probe.Description }</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, agent := range agents {
+				{{ region := agent.region() }}
+				<tr>
+					<th class="text-right">
+						<a class="link text-nowrap" href={ templ.URL(cloud.URLPrefix() + region.URLPrefix()) }>
+							{ region.Name }
+						</a>
+						<br/>
+						<small class="text-pretty">{ region.Location }</small>
+					</th>
+					<td class="border-left">
+						<a href={ templ.URL(probe.DetailsURL(cloud, region)) }>
+							<div class="flex">
+								<div class="mr-2 content-center">
+									<div class="link inline-block px-px">
+										@statusSpan(issues.get(agent.CloudRegion, probe.Name))
+									</div>
+								</div>
+								<div class="text-xs text-left">
+									<dl class="grid grid-cols-[max-content_1fr] gap-x-1 overflow-hidden">
+										<dt class="text-right">version:</dt>
+										<dd class="font-mono">
+											{ agent.Version }
+										</dd>
+										<dt class="text-right">uptime:</dt>
+										<dd>
+											@templates.Duration(agent.Uptime, time.Minute)
+										</dd>
+										<dt class="text-right">errors:</dt>
+										<dd
+											if agent.Errors > 0 {
+												class="tabular-nums text-red-800 dark:text-red-200"
+											} else {
+												class="tabular-nums"
+											}
+										>
+											{ strconv.Itoa(agent.Errors) }
+										</dd>
+									</dl>
+								</div>
+							</div>
+						</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+		@listRegionsTfoot(2)
+	</table>
+}
+
+templ listAgentRegionsTempl(cloud *data.Cloud, probe *data.ProbeDefinition, agents []*agentInfo, issues *issueMap) {
+	@tableContainer(
+		listRegionsHeader(cloud, probe),
+		listAgentRegionsTable(cloud, probe, agents, issues),
+		templates.OpenIssuesNav(cloud.URLPrefix(), issues.counter),
+	)
+}

@@ -1,0 +1,37 @@
+<script>"use strict";
+  function prettifyTimestamps() {
+    const defaultFormat = 'yyyy-LL-dd HH:mm ZZZZ';
+    document.querySelectorAll('span.timestamp-raw').forEach(function(span){
+      const dt = luxon.DateTime.fromISO(span.innerHTML);
+      if (dt.isValid) {
+        span.innerHTML = dt.toFormat(span.dataset.timestamp_fmt || defaultFormat);
+        span.classList.remove('timestamp-raw');
+      }
+    });
+  }
+  function resizeActiveCharts() {
+    activeCharts.forEach(function(chart) {
+      chart.resize();
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    prettifyTimestamps();
+  });
+  document.addEventListener('htmx:afterSettle', function() {
+    prettifyTimestamps();
+  });
+  document.addEventListener('htmx:beforeSwap', function(evt) {
+    if (evt.detail.target.id === 'body') {
+      activeCharts.forEach(function(chart, key) {
+        chart.dispose();
+        activeCharts.delete(key);
+      });
+    }
+  });
+  window.addEventListener('resize', debounce(function() {
+    resizeActiveCharts();
+  }, 100));
+  screen.orientation.addEventListener('change', debounce(function() {
+    resizeActiveCharts();
+  }, 100));
+</script>

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mon-analyst
+description: A Kubernetes Helm chart for mon-analyst
+type: application
+version: 0.1.0
+appVersion: undefined

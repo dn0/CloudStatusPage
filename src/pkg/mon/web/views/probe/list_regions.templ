@@ -1,0 +1,30 @@
+package probe
+
+import (
+	"cspage/pkg/data"
+	"strconv"
+)
+
+templ listRegionsHeader(cloud *data.Cloud, probe *data.ProbeDefinition) {
+	<ol>
+		<li>
+			<a class="link" href={ templ.URL(cloud.URLPrefix()) }>{ cloud.Name }</a>
+		</li>
+		<li>
+			&rsaquo;
+		</li>
+		<li>
+			<a class="link" href={ templ.URL(cloud.URLPrefix() + probe.URLPrefix()) }>{ probe.Description }</a>
+		</li>
+	</ol>
+}
+
+templ listRegionsTfoot(colspan int) {
+	<tfoot>
+		<tr>
+			<td colspan={ strconv.Itoa(colspan) } class="text-right">
+				<small><sup>&ast;</sup>Stats are calculated from last 24 hours</small>
+			</td>
+		</tr>
+	</tfoot>
+}

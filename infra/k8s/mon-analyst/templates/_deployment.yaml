@@ -1,0 +1,62 @@
+{{- define "deployment" -}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .root.Release.Name }}-{{ .cloud }}"
+  labels:
+    app: {{ .root.Release.Name }}
+    chart: {{ .root.Chart.Name }}
+    version: {{ .root.Chart.AppVersion | quote }}
+    cloud: {{ .cloud | quote }}
+spec:
+  replicas: 1
+  strategy:
+   rollingUpdate:
+    maxSurge: 0
+    maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .root.Release.Name }}
+      cloud: {{ .cloud | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .root.Release.Name }}
+        cloud: {{ .cloud | quote }}
+      annotations:
+        checksum/config: {{ .checksum_config }}
+    spec:
+      terminationGracePeriodSeconds: 35
+      serviceAccountName: {{ .root.Release.Name }}
+      containers:
+        - name: {{ .root.Chart.Name }}
+          image: "{{ .root.Values.image.repository }}:{{ .root.Values.image.tag }}"
+          imagePullPolicy: {{ .root.Values.image.pullPolicy }}
+          env:
+            - name: CLOUD
+              value: "{{ .cloud }}"
+          envFrom:
+            - configMapRef:
+                name: {{ .root.Release.Name }}
+            - secretRef:
+                name: {{ .root.Release.Name }}
+            - secretRef:
+                name: {{ .root.Release.Name }}-postgres
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            timeoutSeconds: 1
+            failureThreshold: 2
+            httpGet:
+              path: /healthz
+              port: 8000
+          resources:
+            requests:
+              cpu: "1m"
+              memory: "10Mi"
+            limits:
+              memory: "200Mi"
+{{ end -}}

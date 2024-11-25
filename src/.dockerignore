@@ -1,0 +1,10 @@
+bin/*
+tmp/*
+sql/
+Dockerfile
+README.md
+/.*
+.git
+**/.keep
+**/.gitignore
+**/input.css

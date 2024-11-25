@@ -1,0 +1,18 @@
+image:
+  repository: europe-docker.pkg.dev/cloudstatus-central/mon/scribe
+  tag: latest
+  pullPolicy: IfNotPresent
+
+clouds:
+  - gcp
+  - aws
+  - azure
+
+env:
+  LOG_LEVEL: INFO
+  LOG_FORMAT: json-gcp
+  PUBSUB_PROJECT_ID: cloudstatus-p
+  #PUBSUB_PING_SUBSCRIPTION: "mon-pings-$cloud"
+  #PUBSUB_PROBE_SUBSCRIPTION: "mon-probes-$cloud"
+
+secret_env: {}

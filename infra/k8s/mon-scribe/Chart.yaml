@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mon-scribe
+description: A Kubernetes Helm chart for mon-scribe
+type: application
+version: 0.1.0
+appVersion: undefined

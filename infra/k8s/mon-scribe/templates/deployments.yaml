@@ -1,0 +1,5 @@
+{{- $root := . -}}
+{{- $checksum_config := include (print $.Template.BasePath "/configmap.yaml") . | sha256sum -}}
+{{- range $cloud := .Values.clouds }}
+{{ include "deployment" (dict "root" $root "cloud" $cloud "checksum_config" $checksum_config) }}
+{{- end }}

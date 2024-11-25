@@ -1,0 +1,29 @@
+package templates
+
+templ nav(active NavName) {
+	<nav class="top-0 w-screen md:sticky px-1 py-5 lg:px-6 z-30 bg-white/70 dark:bg-black/70 border-b border-gray-100 dark:border-gray-800 backdrop-blur-md">
+		<div class="flex justify-between font-semibold">
+			<ul class="flex">
+				for _, item := range navItems {
+					if item.name == navSeparator {
+						<li aria-hidden="true" tabindex="-1">
+							<span class="px-2 py-2">|</span>
+						</li>
+					} else {
+						<li>
+							<a
+								href={ item.url }
+								role="button"
+								if item.name == active {
+									class="px-2 py-2 text-gray-800 dark:text-gray-100 border-b-2 border-blue-500 dark:border-blue-400"
+								} else {
+									class="px-2 py-2 text-gray-700 dark:text-gray-200 hover:text-gray-950 hover:dark:text-gray-50 hover:border-b-1 hover:border-blue-500 hover:dark:border-blue-400"
+								}
+							>{ item.title }</a>
+						</li>
+					}
+				}
+			</ul>
+		</div>
+	</nav>
+}

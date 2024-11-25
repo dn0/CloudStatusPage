@@ -1,0 +1,86 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: core
+spec:
+  instances: 2
+  imageName: "ghcr.io/dn0/cloudnative-pg-timescaledb:16.4-53-bookworm"
+  storage:
+    size: 100Gi
+    storageClass: premium-rwo
+  backup:
+    retentionPolicy: "14d"
+    barmanObjectStore:
+      destinationPath: "gs://cloudstatus-p-backups/postgres"
+      googleCredentials:
+        gkeEnvironment: true
+      wal:
+        compression: snappy
+      data:
+        compression: snappy
+  monitoring:
+    enablePodMonitor: false
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: topology.kubernetes.io/zone
+    podAntiAffinityType: required
+  managed:
+    roles:
+      - name: "mon-scribe"
+        ensure: present
+        login: true
+        passwordSecret:
+          name: role-mon-scribe
+        inRoles:
+          - pg_read_all_data
+          - pg_write_all_data
+      - name: "mon-analyst"
+        ensure: present
+        login: true
+        passwordSecret:
+          name: role-mon-analyst
+        inRoles:
+          - pg_read_all_data
+          - pg_write_all_data
+      - name: "mon-web"
+        ensure: present
+        login: true
+        passwordSecret:
+          name: role-mon-web
+        inRoles:
+          - pg_read_all_data
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+      encoding: UTF8
+  postgresql:
+    shared_preload_libraries:
+      - pg_stat_statements
+      - timescaledb
+    parameters:
+      synchronous_commit: "off"
+      fsync: "on"
+      max_connections: "100"
+      max_locks_per_transaction: "64"
+      max_worker_processes: "16"  # >= max_parallel_workers + timescaledb.max_background_workers
+      max_parallel_workers: "8"
+      max_parallel_workers_per_gather: "0" # see github.com/timescale/timescaledb-toolkit/issues/811
+      shared_buffers: "128MB"
+      effective_cache_size: "1GB"
+      maintenance_work_mem: "128MB"
+      work_mem: "64MB"
+      temp_file_limit: "1GB"
+      effective_io_concurrency: "20"
+      random_page_cost: "3.0"
+      log_line_prefix: "%t [%p]: [%c-%l] %u@%d,app=%a [%e] "
+      log_min_duration_statement: "5s"
+      log_lock_waits: "on"
+      log_checkpoints: "off"
+      timescaledb.telemetry_level: "off"
+      timescaledb.license: "timescale"
+      timescaledb.max_background_workers: "4"
+  resources:  # TODO: too low
+    requests:
+      memory: "1500Mi"
+      cpu: "10m"

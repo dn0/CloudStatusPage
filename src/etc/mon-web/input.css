@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .well-empty {
+    @apply bg-white dark:bg-black rounded-lg border border-gray-100 dark:border-gray-800;
+  }
+
+  .well {
+    @apply p-2 lg:p-4 bg-white dark:bg-black rounded-lg border border-gray-100 dark:border-gray-800 overflow-x-auto;
+  }
+  .well > header {
+    @apply text-lg sm:text-xl md:text-2xl font-bold;
+  }
+  .well > header > ol {
+    @apply flex gap-x-1 items-center;
+  }
+
+  .well-nav {
+    @apply flex items-center;
+  }
+  .well-nav > nav {
+    @apply inline-flex p-1 font-medium rounded-lg bg-gray-100 dark:bg-gray-900 border border-gray-100 dark:border-gray-800;
+  }
+  .well-nav > nav > a {
+    @apply inline-block rounded-md px-2 sm:px-3 py-1 focus:relative;
+  }
+  .well-nav > nav > a.disabled {
+    @apply text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 pointer-events-none opacity-50;
+  }
+  .well-nav > nav > a.inactive {
+    @apply text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200;
+  }
+  .well-nav > nav > a.active {
+    @apply text-blue-500 dark:text-blue-400 bg-white dark:bg-black shadow-sm pointer-events-none;
+  }
+
+  .table-bordered {
+    @apply border-collapse;
+  }
+  .table-bordered thead {
+    @apply [&_tr]:border-b;
+  }
+  .table-bordered thead > tr {
+    @apply border-b border-gray-200 dark:border-gray-700;
+  }
+  .table-bordered tbody {
+    @apply [&_tr:last-child]:border-0;
+  }
+  .table-bordered tbody > tr {
+    @apply border-b border-gray-200 dark:border-gray-700;
+  }
+  .table-bordered th, .table-bordered td {
+    @apply px-1 md:px-2 lg:px-4 py-2;
+  }
+  .table-bordered th {
+    @apply font-medium;
+  }
+  .table-bordered tfoot td {
+    @apply pt-4 pb-0;
+    column-span: all;
+  }
+  .table-bordered tfoot td .summary {
+    @apply flex flex-nowrap gap-x-1 justify-between;
+  }
+
+  .border-top {
+    @apply border-t border-gray-200 dark:border-gray-700;
+  }
+  .border-left {
+    @apply border-l border-gray-200 dark:border-gray-700;
+  }
+  .border-right {
+    @apply border-r border-gray-200 dark:border-gray-700;
+  }
+  .border-bottom {
+    @apply border-b border-gray-200 dark:border-gray-700;
+  }
+
+  .badge {
+    @apply inline-flex text-xs font-semibold items-center justify-center rounded-full px-2.5 py-0.5;
+  }
+  .badge.emerald {
+    @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-700 dark:text-emerald-100;
+  }
+  .badge.amber {
+    @apply bg-amber-100   text-amber-700   dark:bg-amber-700   dark:text-amber-100;
+  }
+  .badge.red {
+    @apply bg-red-100     text-red-700     dark:bg-red-700     dark:text-red-100;
+  }
+  .badge.green {
+    @apply bg-green-100   text-green-700   dark:bg-green-700   dark:text-green-100;
+  }
+  .badge.gray {
+    @apply bg-gray-100    text-gray-700    dark:bg-gray-700    dark:text-gray-100;
+  }
+
+  a.link, a.link:visited {
+    @apply text-gray-700 dark:text-gray-200 underline decoration-2 decoration-blue-500 dark:decoration-blue-600;
+  }
+  a.link:hover, a.link.active {
+    @apply text-gray-800 dark:text-gray-100 underline decoration-4 decoration-blue-500 dark:decoration-blue-500;
+    text-decoration-thickness: 3px;
+  }
+
+  a.link-ext, a.link-int, a.link-ext:visited, a.link-int:visited {
+    @apply underline decoration-1 decoration-blue-500 dark:decoration-blue-600;
+  }
+  a.link-ext:hover, a.link-ext.active, a.link-int:hover, a.link-int.active {
+    @apply text-gray-800 dark:text-gray-100 underline decoration-2 decoration-blue-500 dark:decoration-blue-500;
+  }
+  a.link-ext::after {
+    content: "⧉";
+    padding-left: 2px;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  div.link {
+    @apply text-gray-700 dark:text-gray-200 border-b border-blue-500 dark:border-blue-600;
+  }
+  div.link:hover {
+    @apply text-gray-800 dark:text-gray-100 border-b-2 -mb-px border-blue-500 dark:border-blue-500;
+  }
+
+  span.link {
+    @apply text-gray-700 dark:text-gray-200 underline decoration-2 decoration-blue-500 dark:decoration-blue-600;
+  }
+  span.link:hover {
+    @apply text-gray-800 dark:text-gray-100 underline decoration-4 decoration-blue-500 dark:decoration-blue-500;
+    text-decoration-thickness: 3px;
+  }
+
+  .loading {
+    @apply z-40 backdrop-opacity-80 backdrop-blur-md transition cursor-wait;
+  }
+  .loading-grid {
+    grid-area: 1 / 1;
+  }
+}
+
+.htmx-request {
+  display: block;
+}
+
+div.chart-tooltip-wrapper {
+}
+span.chart-tooltip-title {
+  @apply font-medium;
+}
+span.chart-tooltip-value {
+  @apply font-medium float-right pl-3.5;
+}
+pre.chart-tooltip-code {
+  @apply text-xs font-mono break-all whitespace-normal max-w-72 max-h-32 lg:max-w-96 lg:max-h-52 m-0 pl-3.5 pt-0.5 bg-gray-50 dark:bg-gray-900 overflow-auto;
+}

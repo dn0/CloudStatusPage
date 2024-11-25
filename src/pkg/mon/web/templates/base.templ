@@ -1,0 +1,58 @@
+package templates
+
+import (
+	_ "embed"
+	"cspage/pkg/config"
+)
+
+const (
+	StaticURL = "/static/"
+)
+
+//go:embed main.js.min.html
+var mainJS jsBytes
+
+templ head() {
+	<head>
+		<title>CloudStatus.page</title>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta name="htmx-config" content='{"includeIndicatorStyles":false}'/>
+		<meta name="description" content="Transparent monitoring of public cloud services"/>
+		<meta name="keywords" content="Cloud, monitoring, status, statuspage, AWS, Amazon Web Services, Azure, GCP, Google Cloud"/>
+		<meta name="author" content="Daniel Kontsek"/>
+		<link rel="canonical" href="https://cloudstatus.page"/>
+		<link rel="manifest" href={ StaticURL + "logo/site.webmanifest" }/>
+		<link rel="icon" type="image/png" sizes="16x16" href={ StaticURL + "logo/favicon-16x16.png" }/>
+		<link rel="icon" type="image/png" sizes="32x32" href={ StaticURL + "logo/favicon-32x32.png" }/>
+		<link rel="apple-touch-icon" sizes="180x180" href={ StaticURL + "logo/apple-touch-icon.png" }/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous"/>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+		<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" crossorigin="anonymous"/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" crossorigin="anonymous"/>
+		<link rel="stylesheet" href={ StaticURL + "css/style.min.css?version=" + config.Version }/>
+		<script src={ StaticURL + "js/htmx.min.js?version=0" }></script>
+		<script src={ StaticURL + "js/luxon.min.js?version=0" }></script>
+		<script src={ StaticURL + "js/echarts.min.js?version=0" }></script>
+		<script src={ StaticURL + "js/echarts.themes.min.js?version=1" }></script>
+		<script src={ StaticURL + "js/world.js?version=0" }></script>
+		@mainJS
+	</head>
+}
+
+templ Base(active NavName, main templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		@head()
+		<body class="flex flex-col min-h-screen bg-lgt dark:bg-drk text-sm text-gray-700 dark:text-gray-200" hx-boost="true" hx-indicator="#loading-main" id="body">
+			<div class="hidden fixed top-0 left-0 w-screen h-screen z-50 backdrop-opacity-80 backdrop-blur-md overflow-hidden transition cursor-wait" id="loading-main">
+				@LoadingDiv()
+			</div>
+			@nav(active)
+			<main class="px-3 py-2 lg:px-8 lg:py-4">
+				@main
+			</main>
+			<footer class="p-2 mt-auto z-20 text-xs text-center">&nbsp;</footer>
+		</body>
+	</html>
+}

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cspage/pkg/pb";
+
+enum AgentAction {
+  AGENT_UNKNOWN = 0;
+  AGENT_START = 1;
+  AGENT_STOP_MANUAL = 2;
+  AGENT_STOPPING = 4;
+  AGENT_STOP = 6;
+}
+
+message Agent {
+  string id = 1;
+  AgentAction action = 2;
+  google.protobuf.Timestamp time = 3;
+  string version = 4;
+  string hostname = 5;
+  string ip_address = 8;
+  string cloud_region = 6;
+  string cloud_zone = 7;
+  bytes sysinfo = 15;
+}

@@ -1,0 +1,11 @@
+package probe
+
+import "cspage/pkg/mon/web/templates"
+
+templ statusSpan(i *simpleIssue) {
+	if i == nil {
+		<span title="Green">🟩</span>
+	} else {
+		@templates.IssueSeveritySpan(i.severity)
+	}
+}

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "pkg/pb/alert.proto";
+
+option go_package = "cspage/pkg/pb";
+
+enum IncidentStatus {
+  INCIDENT_ANY = 0;
+  INCIDENT_CLOSED = 1;
+  INCIDENT_OPEN = 3;
+}
+
+enum IncidentSeverity {
+  INCIDENT_NONE = 0; // gray or green
+  INCIDENT_LOW = 1; // yellow
+  INCIDENT_MEDIUM = 2; // orange
+  INCIDENT_HIGH = 3; // red
+}
+
+message CloudRegion {
+  string region = 1;
+}
+
+message Incident {
+  string id = 1;
+  google.protobuf.Timestamp created = 3;
+  google.protobuf.Timestamp updated = 4;
+  google.protobuf.Timestamp time_begin = 5;
+  google.protobuf.Timestamp time_end = 6;
+  IncidentSeverity severity = 8;
+  IncidentStatus status = 9;
+  repeated CloudRegion cloud_regions = 10;
+  repeated Alert alerts = 11;
+  bytes data = 15;
+}

@@ -1,0 +1,85 @@
+package probe
+
+import (
+	"cspage/pkg/data"
+	"cspage/pkg/mon/web/templates"
+	"strconv"
+)
+
+templ listProbeRegionsTable(cloud *data.Cloud, regions []*data.CloudRegion, probe *data.ProbeDefinition, issues *issueMap, stats *probeStats) {
+	{{ roundingDuration, roundingPlaces := probe.LatencyRounding() }}
+	<table class="table-bordered table-auto">
+		<thead class="text-center">
+			<tr class="text-xs md:test-sm">
+				<th></th>
+				for _, action := range probe.Config.Actions {
+					if action.Id < data.ProbeMaxDisplayActionId {
+						<th class="border-left">{ action.ShortName() }</th>
+					}
+				}
+			</tr>
+		</thead>
+		<tbody>
+			for _, region := range regions {
+				<tr>
+					<th class="text-right">
+						<a class="link text-nowrap" href={ templ.URL(cloud.URLPrefix() + region.URLPrefix()) }>
+							{ region.Name }
+						</a>
+						<br/>
+						<small class="text-pretty">{ region.Location }</small>
+					</th>
+					for _, action := range probe.Config.Actions {
+						if action.Id < data.ProbeMaxDisplayActionId {
+							<td class="border-left">
+								<a href={ templ.URL(probe.DetailsURL(cloud, region)) }>
+									<div class="flex">
+										<div class="mr-2 content-center">
+											<div class="link inline-block px-px">
+												@statusSpan(issues.get2(region.Name, probe.Name, action.Id))
+											</div>
+										</div>
+										{{ pstats := stats.get(region.Name, action.Id) }}
+										<div class="text-xs text-left">
+											<dl class="grid grid-cols-[max-content_1fr] gap-x-1 overflow-hidden">
+												<dt class="text-right">
+													if stats.isFastest(region.Name, action.Id) {
+														&uarr;&thinsp;avg:
+													} else if stats.isSlowest(region.Name, action.Id) {
+														&darr;&thinsp;avg:
+													} else {
+														avg:
+													}
+												</dt>
+												<dd class="tabular-nums">
+													@templates.DurationMilliseconds(pstats.LatencyAvg, roundingDuration, roundingPlaces)
+												</dd>
+												<dt class="text-right">&sigma;:</dt>
+												<dd class="tabular-nums">
+													@templates.DurationMilliseconds(pstats.LatencySD, roundingDuration, roundingPlaces)
+												</dd>
+												<dt class="text-right">errors:</dt>
+												<dd class="tabular-nums">
+													{ strconv.Itoa(pstats.Errors) }
+												</dd>
+											</dl>
+										</div>
+									</div>
+								</a>
+							</td>
+						}
+					}
+				</tr>
+			}
+		</tbody>
+		@listRegionsTfoot(len(probe.Config.Actions) + 1)
+	</table>
+}
+
+templ listProbeRegionsTempl(cloud *data.Cloud, regions []*data.CloudRegion, probe *data.ProbeDefinition, issues *issueMap, stats *probeStats) {
+	@tableContainer(
+		listRegionsHeader(cloud, probe),
+		listProbeRegionsTable(cloud, regions, probe, issues, stats),
+		templates.OpenIssuesNav(cloud.URLPrefix(), issues.counter),
+	)
+}

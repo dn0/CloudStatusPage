@@ -1,0 +1,232 @@
+package probe
+
+import (
+	"net/url"
+	"cspage/pkg/data"
+	"cspage/pkg/mon/web/templates"
+	"cspage/pkg/pb"
+	"strconv"
+	"time"
+)
+
+templ detailsHeader(cloud *data.Cloud, region *data.CloudRegion, probe *data.ProbeDefinition) {
+	{{ cloudURL := cloud.URLPrefix() }}
+	<ol>
+		<li><a class="link" href={ templ.URL(cloudURL) }>{ cloud.Name }</a></li>
+		<li>&rsaquo;</li>
+		<li><a class="link text-nowrap" href={ templ.URL(cloudURL + region.URLPrefix()) }>{ region.Name }</a></li>
+		<li>&rsaquo;</li>
+		<li><a class="link" href={ templ.URL(cloudURL + probe.URLPrefix()) }>{ probe.Description }</a></li>
+	</ol>
+}
+
+templ probeDetailsTable(region *data.CloudRegion, probe *data.ProbeDefinition, lastJob *data.Job, details *agentDetails) {
+	{{ roundingDuration, _ := probe.LatencyRounding() }}
+	<tbody class="text-left">
+		<tr>
+			<th>Probe:</th>
+			<td>
+				{ probe.Name }
+			</td>
+		</tr>
+		<tr>
+			<th>Region:</th>
+			<td>
+				{ region.Name }
+				<br/>
+				<small class="text-pretty">{ region.Location }</small>
+			</td>
+		</tr>
+		<tr>
+			<th>Freq. interval:</th>
+			<td>
+				@templates.Duration(probe.Config.Interval(), time.Second)
+			</td>
+		</tr>
+		<tr>
+			<th>Timeout:</th>
+			<td>
+				@templates.Duration(probe.Config.Timeout(), time.Second)
+			</td>
+		</tr>
+		<tr>
+			<th>Actions:</th>
+			<td>
+				<div class="w-fit min-w-44">
+					<div class="grid grid-cols-1 text-xs md:text-ss">
+						<ul class="lg:list-disc lg:list-inside text-nowrap hx-disable">
+							for _, action := range probe.Config.Actions {
+								if action.Id < data.ProbeMaxDisplayActionId {
+									<li title={ action.Description } class="text-nowrap">
+										if action.URL == "" {
+											{ action.Name }
+										} else {
+											<a class="link-ext" href={ templ.URL(action.URL) }>{ action.Name }</a>
+										}
+									</li>
+								}
+							}
+						</ul>
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<th>Last job:</th>
+			<td>
+				<div class="w-fit min-w-44 text-xs md:text-ss">
+					<dl class="grid grid-cols-[max-content_1fr] gap-x-1 overflow-hidden">
+						<dt>Time:</dt>
+						<dd>
+							@templates.TimestampWithSeconds(lastJob.Time)
+						</dd>
+						<dt>Took:</dt>
+						<dd>
+							@templates.Duration(lastJob.Took, roundingDuration)
+						</dd>
+					</dl>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<th>
+				Errors:
+			</th>
+			<td>
+				<span
+					if details.errors > 0 {
+						class="tabular-nums text-red-800 dark:text-red-100"
+					} else {
+						class="tabular-nums"
+					}
+				>{ strconv.Itoa(details.errors) }</span>
+				<small><sup>&ast;</sup>since last 24 hours</small>
+			</td>
+		</tr>
+	</tbody>
+}
+
+templ agentDetailsTable(region *data.CloudRegion, probe *data.ProbeDefinition, lastJob *data.Job, details *agentDetails) {
+	{{ roundingDuration, _ := probe.LatencyRounding() }}
+	<tbody class="text-left">
+		<tr>
+			<th>ID:</th>
+			<td>
+				@templates.ShortUUID(details.Id)
+			</td>
+		</tr>
+		<tr>
+			<th>Location:</th>
+			<td class="text-nowrap">
+				if len(details.CloudZone) > 1 {
+					{ details.CloudZone }
+				} else {
+					{ details.CloudRegion }
+				}
+				<br/>
+				<small class="text-pretty">{ region.Location }</small>
+			</td>
+		</tr>
+		<tr>
+			<th>Status:</th>
+			<td>
+				switch details.Status {
+					case pb.AgentAction_AGENT_START:
+						<span class="badge green">
+							Running
+						</span>
+					case pb.AgentAction_AGENT_STOP, pb.AgentAction_AGENT_STOPPING, pb.AgentAction_AGENT_STOP_MANUAL:
+						<span class="badge red">
+							Stopped
+						</span>
+					default:
+						<span class="badge gray">
+							Unknown
+						</span>
+				}
+			</td>
+		</tr>
+		<tr>
+			<th>Uptime:</th>
+			<td>
+				@templates.Duration(details.Uptime, time.Minute)
+			</td>
+		</tr>
+		<tr>
+			<th>Version:</th>
+			<td class="font-mono">{ details.Version }</td>
+		</tr>
+		<tr>
+			<th>Last ping:</th>
+			<td>
+				<div class="w-fit min-w-44 text-xs md:text-ss">
+					<dl class="grid grid-cols-[max-content_1fr] gap-x-1 overflow-hidden">
+						<dt>Time:</dt>
+						<dd>
+							@templates.TimestampWithSeconds(lastJob.Time)
+						</dd>
+						<dt>Took:</dt>
+						<dd>
+							@templates.Duration(lastJob.Took, roundingDuration)
+						</dd>
+					</dl>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<th>
+				Probe errors:
+			</th>
+			<td>
+				<span
+					if details.errors > 0 {
+						class="tabular-nums text-red-800 dark:text-red-100"
+					} else {
+						class="tabular-nums"
+					}
+				>{ strconv.Itoa(details.errors) }</span>
+				<small><sup>&ast;</sup>since last 24 hours</small>
+			</td>
+		</tr>
+	</tbody>
+}
+
+templ detailsTempl(cloud *data.Cloud, region *data.CloudRegion, probe *data.ProbeDefinition, lastJob *data.Job, details *agentDetails, numIssues, numCharts int, qs url.Values) {
+	<section>
+		<div class="well">
+			<header>
+				@detailsHeader(cloud, region, probe)
+			</header>
+		</div>
+		<div class="md:grid md:grid-cols-5 md:gap-1 lg:gap-2 xl:gap-4">
+			<div class="col-span-2 md:w-fit">
+				<div class="well mt-2 lg:mt-4">
+					<table class="table-bordered w-full">
+						if probe.IsPingDefinition() {
+							@agentDetailsTable(region, probe, lastJob, details)
+						} else {
+							@probeDetailsTable(region, probe, lastJob, details)
+						}
+					</table>
+				</div>
+			</div>
+			<div class="col-span-3">
+				if numIssues > 0 {
+					<div class="well mt-2 lg:mt-4 w-full">
+						<div class="grid w-full h-full min-h-36">
+							<div class="loading-grid" hx-get={ probe.IssuesURL(cloud, region) + "/embedded" } hx-trigger="load" hx-indicator="#loading-probe-issues" id="embedded-issues-table"></div>
+							<div class="loading-grid loading hidden overflow-hidden" id="loading-probe-issues">
+								@templates.LoadingDiv()
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+		<div class="xl:grid xl:grid-cols-2 xl:gap-4" hx-get={ string(templ.URL(probe.ChartsURL(cloud, region, qs))) } hx-trigger="load" hx-indicator=".loading-div">
+			for i:=1; i < numCharts+1; i++ {
+				@templates.ChartDiv("chart-"+strconv.Itoa(i), true)
+			}
+		</div>
+	</section>
+}

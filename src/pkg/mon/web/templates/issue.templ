@@ -1,0 +1,102 @@
+package templates
+
+import (
+	"cspage/pkg/data"
+	"cspage/pkg/pb"
+	"strconv"
+)
+
+const IssueLinkedToIncidentSpan = `<span title="Linked to incident">🔗</span>`
+
+var issueTypeTabs = []issueTypeTab{
+	{typ: data.IssueTypeAll, title: "issues", url: data.IssuesURLSuffix},
+	{typ: data.IssueTypeIncident, title: "Incidents", url: data.IncidentsURLSuffix},
+	{typ: data.IssueTypeAlert, title: "Alerts", url: data.AlertsURLSuffix},
+}
+
+type issueTypeTab struct {
+	typ   data.IssueType
+	title string
+	url   string
+}
+
+templ IssueSeveritySpan(severity pb.IncidentSeverity) {
+	switch severity {
+		case pb.IncidentSeverity_INCIDENT_HIGH:
+			<span title="Red">🟥</span>
+		case pb.IncidentSeverity_INCIDENT_MEDIUM:
+			<span title="Orange">🟧</span>
+		case pb.IncidentSeverity_INCIDENT_LOW:
+			<span title="Yellow">🟨</span>
+		default:
+			<span title="Unknown">❔</span>
+	}
+}
+
+templ IssueStatusSpan(status pb.IncidentStatus) {
+	switch status {
+		case pb.IncidentStatus_INCIDENT_OPEN:
+			<span class="badge amber uppercase">
+				{ data.IssueStatusURLTitle[status] }
+			</span>
+		case pb.IncidentStatus_INCIDENT_CLOSED:
+			<span class="badge emerald uppercase">
+				{ data.IssueStatusURLTitle[status] }
+			</span>
+	}
+}
+
+templ IssueTypeSpan(typ data.IssueType) {
+	switch typ {
+		case data.IssueTypeAll:
+			<span title="Issues">📟</span>
+		case data.IssueTypeAlert:
+			<span title="Alert">⚠️</span>
+		case data.IssueTypeIncident:
+			<span title="Incident">🚨</span>
+	}
+}
+
+templ issuesNav(
+	pageURLPrefix,
+	typeURLSuffix string,
+	status pb.IncidentStatus,
+	counter data.IssueCounter,
+	active bool,
+) {
+	<nav role="tablist" aria-orientation="horizontal">
+		for i, tab := range issueTypeTabs {
+			<a
+				role="tab"
+				href={ templ.URL(pageURLPrefix + tab.url + data.IssueStatusURLSuffix[status]) }
+				if active && tab.url == typeURLSuffix {
+					aria-selected="true"
+					tabindex="-1"
+					class="active"
+				} else {
+					aria-selected="false"
+					tabindex="0"
+					class="inactive"
+				}
+			>
+				@IssueTypeSpan(tab.typ)
+				&nbsp;
+				<span class="text-nowrap">
+					if i == 0 {
+						{ data.IssueStatusURLTitle[status] }
+					}
+					{ tab.title }:
+					{ strconv.Itoa(counter.Get(tab.typ)) }
+				</span>
+			</a>
+		}
+	</nav>
+}
+
+func IssuesNav(pageURLPrefix, typeURLSuffix string, status pb.IncidentStatus, counter data.IssueCounter) templ.Component {
+	return issuesNav(pageURLPrefix, typeURLSuffix, status, counter, true)
+}
+
+func OpenIssuesNav(pageURLPrefix string, counter data.IssueCounter) templ.Component {
+	return issuesNav(pageURLPrefix, data.IssuesURLSuffix, pb.IncidentStatus_INCIDENT_OPEN, counter, false)
+}

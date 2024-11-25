@@ -1,0 +1,6 @@
+resources:
+  - ../production
+
+patches:
+  - path: cluster.yaml
+  - path: backup_daily.yaml

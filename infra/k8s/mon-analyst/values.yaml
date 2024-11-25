@@ -1,0 +1,17 @@
+image:
+  repository: europe-docker.pkg.dev/cloudstatus-central/mon/analyst
+  tag: latest
+  pullPolicy: IfNotPresent
+
+clouds:
+  - gcp
+  - aws
+  - azure
+
+env:
+  LOG_LEVEL: INFO
+  LOG_FORMAT: json-gcp
+  PUBSUB_PROJECT_ID: cloudstatus-p
+  PUBSUB_ALERT_TOPIC: mon-alerts
+
+secret_env: {}

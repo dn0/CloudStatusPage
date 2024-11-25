@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cspage/pkg/pb";
+
+enum ResultStatus {
+  RESULT_UNKNOWN = 0;
+  RESULT_SUCCESS = 1;
+  RESULT_FAILURE = 2;
+  RESULT_TIMEOUT = 3;
+}
+
+message Result {
+  uint32 action = 1;
+  ResultStatus status = 2;
+  google.protobuf.Timestamp time = 3;
+  google.protobuf.Duration latency = 4;
+  string error = 5;
+}

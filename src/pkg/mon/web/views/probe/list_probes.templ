@@ -1,0 +1,59 @@
+package probe
+
+import (
+	"cspage/pkg/data"
+	"cspage/pkg/mon/web/templates"
+)
+
+templ listProbesHeader(cloud *data.Cloud, region *data.CloudRegion) {
+	<ol>
+		<li>
+			<a class="link" href={ templ.URL(cloud.URLPrefix()) }>{ cloud.Name }</a>
+		</li>
+		<li>
+			&rsaquo;
+		</li>
+		<li>
+			<a class="link text-nowrap" href={ templ.URL(cloud.URLPrefix() + region.URLPrefix()) }>{ region.Name }</a>
+		</li>
+	</ol>
+}
+
+templ listProbesTable(cloud *data.Cloud, region *data.CloudRegion, probes []*data.ProbeDefinition, issues *issueMap) {
+	<table class="table-bordered table-auto">
+		<thead class="text-center">
+			<tr>
+				<th></th>
+				<th class="border-left">
+					<span class="text-nowrap">{ region.Name }</span>
+					<br/>
+					<small class="text-pretty">{ region.Location }</small>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, probe := range probes {
+				<tr>
+					<th class="text-right text-balance">
+						<a class="link" href={ templ.URL(cloud.URLPrefix() + probe.URLPrefix()) }>{ probe.Description }</a>
+					</th>
+					<td class="text-center border-left">
+						<div class="link overflow-hidden inline-block px-px">
+							<a href={ templ.URL(probe.DetailsURL(cloud, region)) }>
+								@statusSpan(issues.get(region.Name, probe.Name))
+							</a>
+						</div>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+templ listProbesTempl(cloud *data.Cloud, region *data.CloudRegion, probes []*data.ProbeDefinition, issues *issueMap) {
+	@tableContainer(
+		listProbesHeader(cloud, region),
+		listProbesTable(cloud, region, probes, issues),
+		templates.OpenIssuesNav(cloud.URLPrefix()+region.URLPrefix(), issues.counter),
+	)
+}

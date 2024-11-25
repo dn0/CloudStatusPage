@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "pkg/pb/job.proto";
+import "pkg/pb/result.proto";
+
+option go_package = "cspage/pkg/pb";
+
+message Probe {
+  Job job = 1;
+  repeated Result result = 10;
+}

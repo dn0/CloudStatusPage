@@ -1,0 +1,23 @@
+package templates
+
+templ ChartDiv(id string, loading bool) {
+	<div id={ id } class="well-empty mt-2 lg:mt-4 w-full h-[340px] md:h-[440px] lg:h-[540px] xl:h-[340px] 2xl:h-[520px] flex items-center justify-center" role="img" aria-label="chart">
+		<div class="loading-div loading w-full h-full">
+			if loading {
+				@LoadingDiv()
+			}
+		</div>
+	</div>
+	<div class="loading-div hidden"></div> // dummy div because the actual loading-div gets replaced by echarts and htmx throws an error on browser back button
+}
+
+templ MapChartDiv(id string, loading bool) {
+	<div id={ id } class="w-full h-full flex items-center justify-center" role="img" aria-label="chart">
+		<div class="loading-div loading w-full h-full">
+			if loading {
+				@LoadingDiv()
+			}
+		</div>
+	</div>
+	<div class="loading-div hidden"></div> // dummy div because the actual loading-div gets replaced by echarts and htmx throws an error on browser back button
+}

@@ -1,0 +1,224 @@
+package issue
+
+import (
+	"net/url"
+	"cspage/pkg/data"
+	"cspage/pkg/mon/web/templates"
+	"cspage/pkg/pb"
+	"strconv"
+	"time"
+)
+
+templ listHeader(
+	pageURL string,
+	title string,
+	cloud *data.Cloud,
+	region *data.CloudRegion,
+	probe *data.ProbeDefinition,
+	status pb.IncidentStatus,
+) {
+	<header>
+		<ol>
+			if cloud != nil {
+				<li>
+					<a class="link" href={ templ.URL(cloud.URLPrefix()) }>{ cloud.Name }</a>
+				</li>
+				<li>&rsaquo;</li>
+				if region != nil {
+					<li>
+						<a class="link text-nowrap" href={ templ.URL(cloud.URLPrefix() + region.URLPrefix()) }>{ region.Name }</a>
+					</li>
+					<li>&rsaquo;</li>
+					if probe != nil {
+						<li>
+							<a class="link" href={ templ.URL(cloud.URLPrefix() + region.URLPrefix() + probe.URLPrefix()) }>{ probe.Description }</a>
+						</li>
+						<li>&rsaquo;</li>
+					}
+				}
+			}
+			<li>
+				<a class="link" href={ templ.URL(pageURL) }>{ title }</a>
+			</li>
+			if status != pb.IncidentStatus_INCIDENT_ANY {
+				<li>&rsaquo;</li>
+				<li>
+					<a class="link" href={ templ.URL(pageURL + data.IssueStatusURLSuffix[status]) }>{ data.IssueStatusURLTitle[status] }</a>
+				</li>
+			}
+		</ol>
+	</header>
+}
+
+templ listTable(
+	pageURL string,
+	typeURLSuffix string,
+	cloud *data.Cloud,
+	region *data.CloudRegion,
+	issues []*data.Issue,
+	statusClickable bool,
+) {
+	{{ now := time.Now() }}
+	<thead class="text-left">
+		<tr>
+			if region == nil {
+				if cloud == nil {
+					<th>Cloud / Region</th>
+				} else {
+					<th>Region</th>
+				}
+			}
+			<th>Summary</th>
+			<th>Status</th>
+			<th class="hidden sm:table-cell">Started</th>
+			<th class="hidden md:table-cell">Duration</th>
+		</tr>
+	</thead>
+	<tbody class="text-left">
+		for _, i := range issues {
+			{{ duration := templates.Duration(i.Duration(now), time.Minute) }}
+			<tr>
+				if region == nil {
+					<td>
+						<div class="flex flex-col sm:flex-row sm:items-center gap-x-1">
+							if cloud == nil {
+								<div class="text-nowrap">
+									<a class="link" href={ templ.URL(i.Cloud().URLPrefix() + typeURLSuffix) }>{ i.Cloud().Name }</a>
+									&rsaquo;
+								</div>
+							}
+							<div class="flex flex-col content-center">
+								for _, region := range i.Regions() {
+									<div class="text-nowrap">
+										<a class="link" href={ templ.URL(i.Cloud().URLPrefix() + region.URLPrefix() + typeURLSuffix) }>{ region.Name }</a>
+									</div>
+								}
+							</div>
+						</div>
+					</td>
+				}
+				<td>
+					<a href={ templ.URL(i.DetailsURL()) } class="flex flex-col h-full gap-1">
+						<div class="flex-1">
+							@templates.IssueTypeSpan(i.Type)
+							@templ.Raw("&nbsp;")
+							@templates.IssueSeveritySpan(i.Severity())
+							@templ.Raw("&nbsp;")
+							if i.AlertIncidentId != "" {
+								@templ.Raw(templates.IssueLinkedToIncidentSpan + "&nbsp;")
+							}
+							<span class="link">
+								{ i.Summary() }
+							</span>
+						</div>
+						<div class="inline-block sm:hidden text-nowrap">
+							🕒&nbsp;
+							@templates.TimestampWithoutTZ(i.TimeBegin)
+						</div>
+					</a>
+				</td>
+				<td class="md:static relative">
+					<div class="md:min-w-fit min-w-16">
+						<div class="md:mb-0 mb-6">
+							if statusClickable {
+								<a href={ templ.URL(pageURL + data.IssueStatusURLSuffix[i.Status()]) }>
+									@templates.IssueStatusSpan(i.Status())
+								</a>
+							} else {
+								@templates.IssueStatusSpan(i.Status())
+							}
+						</div>
+						<div class="md:hidden absolute bottom-2 max-w-[70px] overflow-hidden">
+							@duration
+						</div>
+					</div>
+				</td>
+				<td class="hidden sm:table-cell">
+					@templates.Timestamp(i.TimeBegin)
+				</td>
+				<td class="hidden md:table-cell">
+					@duration
+				</td>
+			</tr>
+		}
+	</tbody>
+}
+
+templ listTableFoot(
+	pageURL string,
+	cloud *data.Cloud,
+	region *data.CloudRegion,
+	status pb.IncidentStatus,
+	pager *data.Paginator,
+	embedded bool,
+) {
+	<tfoot>
+		<tr>
+			<td
+				if region == nil {
+					colspan="5"
+				} else {
+					colspan="4"
+				}
+			>
+				<div class="summary">
+					<div>
+						if pager.NumPages > 1 {
+							if embedded {
+								<div hx-disinherit="*">
+									<div class="well-nav" hx-boost="true" hx-target="#embedded-issues-table" hx-push-url="false" hx-indicator="#loading-probe-issues" hx-swap="show:none">
+										@templates.Paginator(pager, pageURL+data.IssueStatusURLSuffix[status]+"/embedded", make(url.Values))
+									</div>
+								</div>
+							} else {
+								<div class="well-nav">
+									@templates.Paginator(pager, pageURL+data.IssueStatusURLSuffix[status], make(url.Values))
+								</div>
+							}
+						}
+					</div>
+					<div class="py-2">
+						<small class="text-nowrap">{ "Total: " + strconv.Itoa(pager.Count) }</small>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</tfoot>
+}
+
+templ listTempl(
+	title string,
+	typeURLSuffix string,
+	cloud *data.Cloud,
+	region *data.CloudRegion,
+	probe *data.ProbeDefinition,
+	status pb.IncidentStatus,
+	issues []*data.Issue,
+	query *data.IssueQuery,
+	embedded bool,
+) {
+	// Cloud, region or probe can be nil (=> empty url prefix)
+	{{ pageURLPrefix := cloud.URLPrefix() + region.URLPrefix() + probe.URLPrefix() }}
+	{{ pageURL := pageURLPrefix + typeURLSuffix }}
+	if embedded {
+		<table class="table-bordered w-full">
+			@listTable(pageURL, typeURLSuffix, cloud, region, issues, false)
+			@listTableFoot(pageURL, cloud, region, status, query.Paginator, true)
+		</table>
+	} else {
+		<section class="w-full md:w-fit max-w-full">
+			<div class="well">
+				@listHeader(pageURL, title, cloud, region, probe, status)
+			</div>
+			<div class="well-nav mt-2 lg:mt-4">
+				@templates.IssuesNav(pageURLPrefix, typeURLSuffix, status, query.Counter)
+			</div>
+			<div class="well mt lg:mt-1">
+				<table class="table-bordered w-full">
+					@listTable(pageURL, typeURLSuffix, cloud, region, issues, true)
+					@listTableFoot(pageURL, cloud, region, status, query.Paginator, false)
+				</table>
+			</div>
+		</section>
+	}
+}

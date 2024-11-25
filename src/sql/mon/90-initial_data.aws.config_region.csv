@@ -1,0 +1,34 @@
+11,us-east-1,"N. Virginia",t,38.994054,-77.452424
+12,us-east-2,"Columbus, Ohio",t,40.094635,-82.754134
+21,us-west-1,"San Francisco, California",t,37.443680,-122.153664
+22,us-west-2,"Oregon",t,45.917467,-119.268449
+31,ca-west-1,"Calgary, Canada",t,50.951313,-113.958409
+41,ca-central-1,"Montréal, Canada",t,45.503182,-73.569806
+51,mx-central-1,"Querétaro, Mexico",f,20.555132,-100.266850
+61,sa-east-1,"São Paulo, Brazil",t,-23.492580,-46.810559
+111,eu-west-1,"Dublin, Ireland",t,53.405655,-6.224503
+112,eu-west-2,"London, England",t,51.508504,-0.060927
+113,eu-west-3,"Paris, France",t,48.600971,2.297664
+121,eu-north-1,"Stockholm, Sweden",t,59.326242,17.841972
+131,eu-south-1,"Milan, Italy",t,45.462833,9.107693
+132,eu-south-2,"Aragón, Spain",t,41.805120,-0.847489
+141,eu-central-1,"Frankfurt, Germany",t,50.099209,8.630393
+142,eu-central-2,"Zurich, Switzerland",t,49.625015,6.094602
+211,ap-northeast-1,"Tokyo, Japan",t,35.617436,139.745918
+212,ap-northeast-2,"Seoul, South Korea",t,37.561659,126.873624
+213,ap-northeast-3,"Osaka, Japan",t,34.619881,135.490357
+221,ap-east-1,"Hong Kong",t,22.290848,114.272338
+231,ap-southeast-1,"Singapore",t,1.321827,103.693064
+232,ap-southeast-2,"Sydney, Australia",t,-33.911772,151.190754
+233,ap-southeast-3,"Jakarta, Indonesia",t,-6.175394,106.827183
+234,ap-southeast-4,"Melbourne, Australia",t,-37.814218,144.963161
+235,ap-southeast-5,"Auckland, New Zealand",f,-36.849636,174.782623
+236,ap-southeast-6,"Bangkok, Thailand",f,13.668434,100.651771
+237,ap-southeast-7,"Kuala Lumpur, Malaysia",f,3.153985,101.706839
+241,ap-south-1,"Mumbai, India",t,19.242550,72.966789
+242,ap-south-2,"Hyderabad, India",f,17.360589,78.474061
+251,me-south-1,"Manama, Bahrain",t,25.941298,50.307391
+252,me-south-2,"Riyadh, Saudi Arabia",f,24.856768,46.736677
+261,me-central-1,"Dubai, UAE",t,24.000249,53.999483
+271,il-central-1,"Tel Aviv, Israel",t,31.531311,34.866765
+311,af-south-1,"Cape Town, South Africa",t,-33.914651,18.375880

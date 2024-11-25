@@ -1,0 +1,24 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: core
+spec:
+  imageName: "ghcr.io/dn0/cloudnative-pg-timescaledb:16.4"
+  instances: 1
+  storage:
+    size: 10Gi
+    storageClass: standard
+  backup: null
+  affinity: null
+  managed:
+    roles: []
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+      postInitSQL:
+        - CREATE DATABASE app1 OWNER app
+        - CREATE DATABASE app2 OWNER app
+        - CREATE DATABASE app3 OWNER app
+        - CREATE DATABASE app4 OWNER app
+        - CREATE DATABASE app5 OWNER app

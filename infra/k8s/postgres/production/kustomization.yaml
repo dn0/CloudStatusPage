@@ -1,0 +1,6 @@
+resources:
+  - namespace.yaml
+  - cluster.yaml
+  - backup_daily.yaml
+
+namespace: postgres

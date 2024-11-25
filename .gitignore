@@ -1,0 +1,13 @@
+.DS_Store
+*.swp
+*.log
+.idea
+.vscode
+.zed
+.terraform
+.terraform.tfstate*
+terraform.tfstate*
+terraform.*.backup
+*_templ.txt
+coverage.out
+node_modules

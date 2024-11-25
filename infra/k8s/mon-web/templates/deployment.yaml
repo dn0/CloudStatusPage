@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}
+    version: {{ .Chart.AppVersion | quote }}
+spec:
+  replicas: 2
+  strategy:
+   rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      terminationGracePeriodSeconds: 25
+      serviceAccountName: {{ .Release.Name }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}
+            - secretRef:
+                name: {{ .Release.Name }}-postgres
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            timeoutSeconds: 1
+            failureThreshold: 2
+            httpGet:
+              path: /healthz
+              port: 8000
+          resources:
+            requests:
+              cpu: "1m"
+              memory: "10Mi"
+            limits:
+              memory: "500Mi"
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 10
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:  # ideally place every pod on nodes in different zones
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: "topology.kubernetes.io/zone"
+                labelSelector:
+                  matchLabels:
+                    app: {{ .Release.Name }}
+          requiredDuringSchedulingIgnoredDuringExecution:  # must place every pod on different node
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchLabels:
+                  app: {{ .Release.Name }}
+

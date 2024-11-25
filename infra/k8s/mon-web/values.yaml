@@ -1,0 +1,12 @@
+image:
+  repository: europe-docker.pkg.dev/cloudstatus-central/mon/web
+  tag: latest
+  pullPolicy: IfNotPresent
+
+env:
+  LOG_LEVEL: INFO
+  LOG_FORMAT: json-gcp
+  HTTP_WRITE_TIMEOUT: "90s"
+  HTTP_IDLE_TIMEOUT: "620s"  # https://cloud.google.com/load-balancing/docs/https#timeout-keepalive-backends
+
+secret_env: {}

@@ -1,0 +1,63 @@
+11,eastus,"Richmond, Virginia",t,37.3719,-79.8164
+12,eastus2,"Richmond, Virginia",t,36.6681,-78.3889
+15,eastus3,"Atlanta, Georgia",f,,
+21,westus,"San Francisco, California",t,37.783,-122.417
+22,westus2,"Moses Lake, Washington",t,47.233,-119.852
+23,westus3,"Phoenix, Arizona",t,33.448376,-112.074036
+41,centralus,"Des Moines, Iowa",t,41.5908,-93.6208
+51,westcentralus,"Cheyenne, Wyoming",t,40.890,-110.234
+61,southcentralus,"San Antonio, Texas",f,29.4167,-98.5
+62,northcentralus,"Chicago, Illinois",t,41.8819,-87.6278
+71,canadaeast,"Quebec City, Canada",f,46.817,-71.217
+72,canadacentral,"Toronto, Canada",f,43.653,-79.383
+81,mexicocentral,"Querétaro, Mexico",f,20.588818,-100.389888
+91,brazilsouth,"Campinas, Brazil",f,-23.55,-46.633
+92,brazilsoutheast,"Rio de Janeiro, Brazil",f,-22.90278,-43.2075
+95,chilecentral,"Santiago, Chile",f,,
+111,westeurope,"Amsterdam, Netherlands",t,52.3667,4.9
+112,northeurope,"Dublin, Ireland",t,53.3478,-6.2597
+131,ukwest,"Cardiff, Wales",t,53.427,-3.084
+132,uksouth,"London, England",t,50.941,-0.799
+141,switzerlandwest,"Geneva, Switzerland",f,46.204391,6.143158
+142,switzerlandnorth,"Zurich, Switzerland",f,47.451542,8.564572
+150,germanywestcentral,"Frankfurt, Germany",t,50.110924,8.682127
+151,germanynorth,"Berlin, Germany",f,53.073635,8.806422
+152,francesouth,"Marseille, France",f,43.8345,2.1972
+153,francecentral,"Paris, France",t,46.3772,2.3730
+154,swedencentral,"Gävle, Sweden",t,60.67488,17.14127
+155,swedensouth,"Staffanstorp, Sweden",f,,
+156,norwaywest,"Stavanger, Norway",f,58.969975,5.733107
+157,norwayeast,"Oslo, Norway",f,59.913868,10.752245
+158,spaincentral,"Madrid, Spain",f,40.4259,3.4209
+159,italynorth,"Milan, Italy",t,45.46888,9.18109
+161,polandcentral,"Warsaw, Poland",f,52.23334,21.01666
+165,greececentral,"Athens, Greece",f,,
+171,austriaeast,"Vienna, Austria",f,,
+172,belgiumcentral,"Brussels, Belgium",f,,
+173,denmarkeast,"Copenhagen, Denmark",f,,
+174,finlandcentral,"Helsinki, Finland",f,,
+210,australiaeast,"Sydney, Australia",f,-33.86,151.2094
+211,australiacentral,"Canberra, Australia",f,-35.3075,149.1244
+212,australiacentral2,"Canberra, Australia",f,-35.3075,149.1244
+213,australiasoutheast,"Melbourne, Australia",f,-37.8136,144.9631
+215,newzealandnorth,"Auckland, New Zealand",f,,
+221,eastasia,"Hong Kong",f,22.267,114.188
+231,southeastasia,"Singapore",f,1.283,103.833
+235,malaysiawest,"Kuala Lumpur, Malaysia",f,,
+237,indonesiacentral,"Jakarta, Indonesia",f,,
+241,koreasouth,"Busan, South Korea",f,35.1796,129.0756
+242,koreacentral,"Seoul, South Korea",f,37.5665,126.9780
+243,japanwest,"Osaka, Japan",f,34.6939,135.5022
+244,japaneast,"Tokyo, Japan",f,35.68,139.77
+251,westindia,"Mumbai, India",f,19.088,72.868
+252,southindia,"Chennai, India",f,12.9822,80.1636
+253,centralindia,"Pune, India",t,18.5822,73.9197
+254,indiasouthcentral,"Hyderabad, India",f,,
+255,taiwannorth,"Taipei, Taiwan",f,,
+261,uaenorth,"Dubai, UAE",f,25.266666,55.316666
+262,uaecentral,"Abu Dhabi, UAE",f,24.466667,54.366669
+263,qatarcentral,"Doha, Qatar",f,25.551462,51.439327
+264,saudiarabiaeast,"Dammam, Saudi Arabia",f,,
+270,israelcentral,"Tel Aviv, Israel",f,31.265569,33.450663
+311,southafricawest,"Cape Town, South Africa",f,-34.075691,18.843266
+312,southafricanorth,"Johannesburg, South Africa",f,-25.731340,28.218370

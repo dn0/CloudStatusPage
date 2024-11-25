@@ -1,0 +1,67 @@
+package probe
+
+import (
+	"cspage/pkg/data"
+	"cspage/pkg/mon/web/templates"
+)
+
+templ matrixHeader(cloud *data.Cloud) {
+	<ol>
+		<li>
+			<a class="link" href={ templ.URL(cloud.URLPrefix()) }>{ cloud.Name }</a>
+			switch cloud.Id {
+				case "azure":
+					<small class="text-xs font-medium"><sup>&ast;</sup>Showing US regions only</small>
+				case "gcp":
+					<small class="text-xs font-medium"><sup>&ast;</sup>Showing US regions only</small>
+			}
+		</li>
+	</ol>
+}
+
+templ matrixTable(cloud *data.Cloud, regions []*data.CloudRegion, probes []*data.ProbeDefinition, issues *issueMap) {
+	<table class="border-collapse table-auto">
+		<thead>
+			<tr class="font-medium">
+				<th class="w-48"></th>
+				for _, region := range regions {
+					<th class="w-14 h-24 p-0 text-left">
+						<div class="w-14 -rotate-40 translate-x-w14-x translate-y-h24-y">
+							<div class="w-36 px-0 py-2 text-nowrap border-bottom">
+								<a class="link text-nowrap" href={ templ.URL(cloud.URLPrefix() + region.URLPrefix()) }>{ region.Name }</a>
+							</div>
+						</div>
+					</th>
+				}
+				<th class="min-w-24"></th>
+			</tr>
+		</thead>
+		<tbody class="[&_tr:last-child]:border-0">
+			for _, probe := range probes {
+				<tr class="border-bottom">
+					<th class="text-right px-1 py-2 border-right">
+						<a class="link" href={ templ.URL(cloud.URLPrefix() + probe.URLPrefix()) }>{ probe.Description }</a>
+					</th>
+					for _, region := range regions {
+						<td class="px-1 py-2 text-center border-right">
+							<div class="link overflow-hidden inline-block px-px">
+								<a href={ templ.URL(probe.DetailsURL(cloud, region)) }>
+									@statusSpan(issues.get(region.Name, probe.Name))
+								</a>
+							</div>
+						</td>
+					}
+					<td></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+templ matrixTempl(cloud *data.Cloud, regions []*data.CloudRegion, probes []*data.ProbeDefinition, issues *issueMap) {
+	@tableContainer(
+		matrixHeader(cloud),
+		matrixTable(cloud, regions, probes, issues),
+		templates.OpenIssuesNav(cloud.URLPrefix(), issues.counter),
+	)
+}

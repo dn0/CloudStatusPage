@@ -1,0 +1,60 @@
+package templates
+
+import (
+	"net/url"
+	"cspage/pkg/data"
+)
+
+// Use inside .well-nav
+templ Paginator(pager *data.Paginator, pageURL string, querystring url.Values) {
+	{{ querystring.Del("page") }}
+	{{ qs := querystring.Encode() }}
+	<nav class="text-xs" aria-orientation="horizontal">
+		<a
+			role="button"
+			aria-selected="false"
+			if pager.HasPrevious() {
+				href={ templ.URL(pageURL + "?" + qs + "&page=" + pager.Previous().String()) }
+				tabindex="0"
+				class="inactive"
+			} else {
+				tabindex="-1"
+				class="disabled"
+			}
+		>&laquo;</a>
+		for _, page := range pager.GetRange() {
+			<a
+				role="button"
+				if page.IsEllipsis() {
+					aria-selected="false"
+					tabindex="-1"
+					class="disabled"
+				} else {
+					if pager.IsCurrent(page) {
+						tabindex="-1"
+						aria-selected="true"
+						class="active"
+						href={ templ.URL(pageURL + "?" + qs + "&page=" + page.String()) }
+					} else {
+						tabindex="0"
+						aria-selected="false"
+						class="inactive"
+						href={ templ.URL(pageURL + "?" + qs + "&page=" + page.String()) }
+					}
+				}
+			>{ page.String() }</a>
+		}
+		<a
+			role="button"
+			aria-selected="false"
+			if pager.HasNext() {
+				href={ templ.URL(pageURL + "?" + qs + "&page=" + pager.Next().String()) }
+				tabindex="0"
+				class="inactive"
+			} else {
+				tabindex="-1"
+				class="disabled"
+			}
+		>&raquo;</a>
+	</nav>
+}
